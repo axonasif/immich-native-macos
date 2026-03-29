@@ -26,39 +26,13 @@ fi
 export HOMEBREW_NO_AUTO_UPDATE=1
 [ -z "$(which brew)" ] && echo "Homebrew is not installed" && exit 1
 brew install \
-    mise \
     node \
     pnpm \
     postgresql@17 \
     redis \
     python@3.11 \
-    rustup \
-    uv \
     vips \
     wget
-
-# Initialise Rust environment
-rustup-init --profile minimal --default-toolchain none -y
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# Install cargo-pgrx (required to build VectorChord)
-cargo install cargo-pgrx --version "=0.14.1" --locked
-
-# Install PostgreSQL extension VectorChord
-VECTORCHORD_VERSION="0.4.3" # Taken from https://github.com/immich-app/immich/blob/main/docker/docker-compose.yml
-vectorchord_staging_dir="$(mktemp -d -t vectorchord)"
-git clone --branch "$VECTORCHORD_VERSION" https://github.com/tensorchord/VectorChord "$vectorchord_staging_dir"
-cd "$vectorchord_staging_dir"
-PGRX_PG_CONFIG_PATH="$(brew --prefix postgresql@17)/bin/pg_config" \
-    cargo pgrx install \
-    -p vchord \
-    --features pg17 \
-    --release \
-    --pg-config "$(brew --prefix postgresql@17)/bin/pg_config"
-cp -a ./sql/upgrade/. "$("$(brew --prefix postgresql@17)/bin/pg_config" --sharedir)/extension"
-sed -E -i "" "s|^#?shared_preload_libraries .*$|shared_preload_libraries = 'vchord.dylib'|" "$(brew --prefix)/var/postgresql@17/postgresql.conf"
-cd -
-rm -rf "$vectorchord_staging_dir"
 
 # Start services
 brew services restart postgresql@17

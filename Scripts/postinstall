@@ -13,6 +13,9 @@ exec >> "$install_logfile" 2>&1
 
 echo "Running postinstall as $(whoami)"
 
+# Install prebuilt VectorChord extension into PostgreSQL
+"$(pwd)/installvectorchord.sh"
+
 # Build Immich application
 "$(pwd)/configureimmich.sh"
 

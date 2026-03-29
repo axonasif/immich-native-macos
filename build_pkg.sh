@@ -77,6 +77,42 @@ build_immich_machine_learning() {
     cd -
 }
 
+build_vectorchord() {
+    dest_dir="$1"
+    vectorchord_version="$2"
+
+    # Build VectorChord PostgreSQL extension from source
+    vectorchord_staging_dir="$(mktemp -d -t vectorchord)"
+    git clone --depth 1 --branch "$vectorchord_version" https://github.com/tensorchord/VectorChord "$vectorchord_staging_dir"
+
+    # Install Rust toolchain and cargo-pgrx
+    rustup-init --profile minimal --default-toolchain none -y
+    export PATH="$HOME/.cargo/bin:$PATH"
+    cargo install cargo-pgrx --version "=0.14.1" --locked
+
+    # Build the extension against the local PostgreSQL
+    cd "$vectorchord_staging_dir"
+    pg_config="$(brew --prefix postgresql@17)/bin/pg_config"
+    PGRX_PG_CONFIG_PATH="$pg_config" \
+        cargo pgrx install \
+        -p vchord \
+        --features pg17 \
+        --release \
+        --pg-config "$pg_config"
+
+    # Collect built extension files into the package
+    pg_pkglibdir="$("$pg_config" --pkglibdir)"
+    pg_sharedir="$("$pg_config" --sharedir)/extension"
+
+    mkdir -p "$dest_dir/vectorchord/lib" "$dest_dir/vectorchord/extension"
+    cp "$pg_pkglibdir"/vchord* "$dest_dir/vectorchord/lib/"
+    cp "$pg_sharedir"/vchord* "$dest_dir/vectorchord/extension/"
+    cp -a ./sql/upgrade/. "$dest_dir/vectorchord/extension/"
+
+    cd -
+    rm -rf "$vectorchord_staging_dir"
+}
+
 fetch_immich_geodata() {
     dest_dir="$1"
 
@@ -125,6 +161,7 @@ mkdir -p "$staging_dir" "$root_dir" "$dist_dir" "$output_dir"
 clone_immich "$IMMICH_TAG" "$staging_dir/immich" "$conf_dir"
 build_immich "$staging_dir/immich" "$dist_dir"
 build_immich_machine_learning "$staging_dir/immich" "$dist_dir"
+build_vectorchord "$dist_dir" "$VECTORCHORD_VERSION"
 fetch_immich_geodata "$dist_dir"
 
 # Fix paths in generated root directory
