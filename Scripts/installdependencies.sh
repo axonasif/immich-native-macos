@@ -41,6 +41,9 @@ brew install \
 rustup-init --profile minimal --default-toolchain none -y
 export PATH="$HOME/.cargo/bin:$PATH"
 
+# Install cargo-pgrx (required to build VectorChord)
+cargo install cargo-pgrx --version "=0.14.1" --locked
+
 # Install PostgreSQL extension VectorChord
 VECTORCHORD_VERSION="0.4.3" # Taken from https://github.com/immich-app/immich/blob/main/docker/docker-compose.yml
 vectorchord_staging_dir="$(mktemp -d -t vectorchord)"
