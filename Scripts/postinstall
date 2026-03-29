@@ -13,9 +13,6 @@ exec >> "$install_logfile" 2>&1
 
 echo "Running postinstall as $(whoami)"
 
-# Create immich user
-"$(pwd)/createuser.sh"
-
 # Build Immich application
 "$(pwd)/configureimmich.sh"
 

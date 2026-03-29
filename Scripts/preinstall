@@ -20,6 +20,9 @@ exec >> "$install_logfile" 2>&1
 
 echo "Running preinstall as $(whoami)"
 
+# Create immich user (needed before installdependencies.sh chowns files)
+"$(pwd)/createuser.sh"
+
 # Install dependencies
 "$(pwd)/installdependencies.sh"
 homebrew_bindir="$(su -l "$USER" -c "which brew" | xargs -I {} dirname "{}")"
