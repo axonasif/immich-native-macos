@@ -14,7 +14,7 @@ The following steps are performed by the installer:
 ## Notes
 
 * Tested on macOS Sequoia with Apple Silicon
-* By default Immich listens on `127.0.0.1:2283` and the Machine Learning microservice listens on `127.0.0.1:3001`
+* By default Immich listens on `127.0.0.1:2283` and the Machine Learning microservice listens on `127.0.0.1:3003`
 * JPEG XL support may differ official Immich due to base-image's dependency differences
 
 ## Building the installer from source
@@ -26,6 +26,7 @@ The following steps are performed by the installer:
 2. Install build dependencies
     ```sh
     brew install \
+        mise \
         node \
         pnpm \
         uv \

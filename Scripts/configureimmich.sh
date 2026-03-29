@@ -30,17 +30,10 @@ set -a
 set +a
 cd "$IMMICH_APP_DIR/machine-learning"
 . ./.venv/bin/activate
-: "\${MACHINE_LEARNING_HOST:=127.0.0.1}"
-: "\${MACHINE_LEARNING_PORT:=3003}"
-: "\${MACHINE_LEARNING_WORKERS:=1}"
-: "\${MACHINE_LEARNING_WORKER_TIMEOUT:=120}"
-exec gunicorn immich_ml.main:app \\
-  -k immich_ml.config.CustomUvicornWorker \\
-  -w "\$MACHINE_LEARNING_WORKERS" \\
-  -b "\$MACHINE_LEARNING_HOST:\$MACHINE_LEARNING_PORT" \\
-  -t "\$MACHINE_LEARNING_WORKER_TIMEOUT" \\
-  --log-config-json log_conf.json \\
-  --graceful-timeout 0
+: "\${IMMICH_HOST:=127.0.0.1}"
+: "\${IMMICH_PORT:=3003}"
+export IMMICH_HOST IMMICH_PORT
+exec python -m immich_ml
 EOF
 chmod 755 "$IMMICH_APP_DIR/machine-learning/start.sh"
 

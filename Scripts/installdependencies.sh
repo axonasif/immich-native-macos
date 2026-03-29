@@ -26,12 +26,14 @@ fi
 export HOMEBREW_NO_AUTO_UPDATE=1
 [ -z "$(which brew)" ] && echo "Homebrew is not installed" && exit 1
 brew install \
+    mise \
     node \
     pnpm \
     postgresql@17 \
     redis \
-    python@3.12 \
+    python@3.11 \
     rustup \
+    uv \
     vips \
     wget
 
@@ -40,7 +42,7 @@ rustup-init --profile minimal --default-toolchain none -y
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # Install PostgreSQL extension VectorChord
-VECTORCHORD_VERSION="0.4.2" # Taken from https://github.com/immich-app/immich/blob/main/docker/docker-compose.yml
+VECTORCHORD_VERSION="0.4.3" # Taken from https://github.com/immich-app/immich/blob/main/docker/docker-compose.yml
 vectorchord_staging_dir="$(mktemp -d -t vectorchord)"
 git clone --branch "$VECTORCHORD_VERSION" https://github.com/tensorchord/VectorChord "$vectorchord_staging_dir"
 cd "$vectorchord_staging_dir"

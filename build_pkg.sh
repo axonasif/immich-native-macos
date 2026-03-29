@@ -39,11 +39,10 @@ build_immich() {
     cd "$repo_dir"
 
     # Build server backend
-    export PYTHON="python3.12"
-    pnpm --filter immich --frozen-lockfile build
-    pnpm --filter immich --frozen-lockfile --prod --no-optional deploy "$dest_dir/server"
+    SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile build
+    SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile --prod --no-optional deploy "$dest_dir/server"
 
-    # Build web frontend
+    # Build web frontend (i18n is required since v2.5)
     pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile --force install
     pnpm --filter @immich/sdk --filter immich-web build
     mkdir -p "$dest_dir/build"
@@ -73,7 +72,7 @@ build_immich_machine_learning() {
     # Build the machine learning backend
     cp -R "$repo_dir/machine-learning" "$dest_dir/"
     cd "$dest_dir/machine-learning"
-    uv venv --relocatable --python "$(brew --prefix python@3.12)/bin/python3.12"
+    uv venv --relocatable --python "$(brew --prefix python@3.11)/bin/python3.11"
     uv sync --extra cpu
     cd -
 }
