@@ -43,6 +43,8 @@ jobs:
       # Step 4: Create Immich package
       - name: Create Immich package
         run: ./build_pkg.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 5: Release prebuilt package
       - name: Release prebuilt package

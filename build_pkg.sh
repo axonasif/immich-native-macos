@@ -53,8 +53,8 @@ build_immich() {
     pnpm --filter @immich/sdk --filter @immich/cli build
     pnpm --filter @immich/cli --prod --no-optional deploy "$dest_dir/cli"
 
-    # Build plugins
-    mise --yes --cd plugins build
+    # Build plugins (scope mise to only the plugins config to avoid installing unrelated monorepo tools)
+    MISE_TRUSTED_CONFIG_PATHS="$(pwd)/plugins/mise.toml" mise --yes --cd plugins build
     mkdir -p "$dest_dir/build/corePlugin/dist"
     cp ./plugins/manifest.json "$dest_dir/build/corePlugin/manifest.json"
     cp -R ./plugins/dist "$dest_dir/build/corePlugin/dist"
