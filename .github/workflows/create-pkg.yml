@@ -40,13 +40,39 @@ jobs:
             uv \
             vips
 
-      # Step 4: Create Immich package
+      # Step 4: Cache build dependencies
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('**/uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-
+
+      - name: Cache mise tool installs
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/mise
+          key: mise-${{ runner.os }}-${{ hashFiles('**/plugins/mise.toml') }}
+          restore-keys: mise-${{ runner.os }}-
+
+      # Step 5: Create Immich package
       - name: Create Immich package
         run: ./build_pkg.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 5: Release prebuilt package
+      # Step 6: Release prebuilt package
       - name: Release prebuilt package
         uses: softprops/action-gh-release@v2
         with:
